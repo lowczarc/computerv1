@@ -8,6 +8,7 @@ use std::ops::Sub;
 pub enum Error {
     BadDegree,
     Invalid,
+    OverflowPower
 }
 
 impl fmt::Display for Error {
@@ -18,6 +19,7 @@ impl fmt::Display for Error {
                 "computerv1 can't solve polynomes of degree higher than 2"
             ),
             Self::Invalid => write!(f, "Invalid input"),
+            Self::OverflowPower => write!(f, "The value of an exponent is greater than the maximal u32 value")
         }
     }
 }
@@ -52,7 +54,7 @@ impl Polynome {
     }
 
     pub fn parse(input: &str) -> Result<Self, Error> {
-        let parsing_regex = Regex::new(r"(?:(?:^|(?P<operator>\+|\-))(?:(?: *(?P<a1>-?\d+(?:.\d+)?) *\* *(?:(?P<a2>-?(?:\d+(?:.\d+)?)?)?(X|x)(?:\^(?P<b1>\d+))?) *)|(?: *(?:(?P<a3>-?(?:\d+(?:.\d+)?)?)?(X|x)(?:\^(?P<b2>\d+))?) *)|(?: *(?P<a4>-?\d+(?:.\d+)?) *)))").unwrap();
+        let parsing_regex = Regex::new(r"(?:(?:^|(?P<operator>\+|\-))(?:(?: *(?P<a1>-?\d+(?:\.\d+)?) *\* *(?:(?P<a2>-?(?:\d+(?:\.\d+)?)?)?(X|x)(?:\^(?P<b1>\d+))?) *)|(?: *(?:(?P<a3>-?(?:\d+(?:\.\d+)?)?)?(X|x)(?:\^(?P<b2>\d+))?) *)|(?: *(?P<a4>-?\d+(?:\.\d+)?) *)))").unwrap();
         let captures = parsing_regex.captures_iter(input);
         let mut ret = Self::new(HashMap::new());
 
@@ -69,7 +71,11 @@ impl Polynome {
 
             let mut a = a1 * a2 * a3 * a4 * operator;
             let b: u32 = if let Some(b) = cap.name("b1").or(cap.name("b2")) {
-                b.as_str().parse().unwrap()
+                if let Ok(x) = b.as_str().parse() {
+                    x
+                } else {
+                    return Err(Error::OverflowPower);
+                }
             } else if cap.name("a4").is_some() {
                 0
             } else {
