@@ -8,7 +8,7 @@ use std::ops::Sub;
 pub enum Error {
     BadDegree,
     Invalid,
-    OverflowPower
+    OverflowPower,
 }
 
 impl fmt::Display for Error {
@@ -19,7 +19,10 @@ impl fmt::Display for Error {
                 "computerv1 can't solve polynomes of degree higher than 2"
             ),
             Self::Invalid => write!(f, "Invalid input"),
-            Self::OverflowPower => write!(f, "The value of an exponent is greater than the maximal u32 value")
+            Self::OverflowPower => write!(
+                f,
+                "The value of an exponent is greater than the maximal u32 value"
+            ),
         }
     }
 }
@@ -141,17 +144,23 @@ mod test {
     use super::*;
 
     #[test]
-    fn display_polynomes() {
+    fn display_polynome1() {
         let polytest1 = Polynome::new(HashMap::new());
         assert_eq!(format!("{}", polytest1), "0");
+    }
 
+    #[test]
+    fn display_polynome2() {
         let mut hashmap = HashMap::new();
         hashmap.insert(0, 2.);
         hashmap.insert(1, 6.);
         hashmap.insert(2, 98.);
         let polytest2 = Polynome::new(hashmap);
         assert_eq!(format!("{}", polytest2), "2 + 6X + 98X^2");
+    }
 
+    #[test]
+    fn display_polynome3() {
         let mut hashmap = HashMap::new();
         hashmap.insert(0, -54.);
         hashmap.insert(1, 0.);
@@ -161,25 +170,34 @@ mod test {
     }
 
     #[test]
-    fn parse_polynomes() {
+    fn parse_polynome1() {
         let polytest1 = Polynome::parse("0").unwrap();
         let mut hashmap = HashMap::new();
         hashmap.insert(0, 0.);
         assert_eq!(polytest1, Polynome::new(hashmap));
+    }
 
+    #[test]
+    fn parse_polynome2() {
         let polytest2 = Polynome::parse("2 + 47 * X^2").unwrap();
         let mut hashmap = HashMap::new();
         hashmap.insert(0, 2.);
         hashmap.insert(2, 47.);
         assert_eq!(polytest2, Polynome::new(hashmap));
+    }
 
+    #[test]
+    fn parse_polynome3() {
         let polytest3 = Polynome::parse("-6 * X^0 + 12 * X^1 - -15 * X^2").unwrap();
         let mut hashmap = HashMap::new();
         hashmap.insert(0, -6.);
         hashmap.insert(1, 12.);
         hashmap.insert(2, 15.);
         assert_eq!(polytest3, Polynome::new(hashmap));
+    }
 
+    #[test]
+    fn parse_polynome4() {
         let polytest4 = Polynome::parse("76.12 + 2.5X^0 - 6.7 * X^1 + 98.3 * X^2").unwrap();
         let mut hashmap = HashMap::new();
         hashmap.insert(0, 78.62);
