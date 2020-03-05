@@ -68,7 +68,7 @@ fn main() {
                             (-sqrt(-discriminant) / (2. * a), "i".into()),
                         ],
                     ];
-                    for solution in solutions.into_iter() {
+                    for solution in solutions.iter() {
                         println!("{}", fmt_number_with_vars(solution.to_vec()));
                     }
                 } else {
